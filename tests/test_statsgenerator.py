@@ -1,8 +1,11 @@
 from src.datacapture import DataCapture
 import pytest
 
-# Tests for less
 def test_less_with_repeated_numbers():
+    """
+    Test that the 'less' method correctly counts numbers less than a given number,
+    including handling repeated numbers in the data.
+    """
     capture = DataCapture()
     capture.add(3)
     capture.add(3)
@@ -10,8 +13,11 @@ def test_less_with_repeated_numbers():
     stats = capture.build_stats()
     assert stats.less(4) == 3
 
-# Tests for greater
 def test_greater_with_repeated_numbers():
+    """
+    Test that the 'greater' method correctly counts numbers greater than a given number,
+    including handling repeated numbers in the data.
+    """
     capture = DataCapture()
     capture.add(3)
     capture.add(3)
@@ -21,6 +27,10 @@ def test_greater_with_repeated_numbers():
     assert stats.greater(3) == 2
 
 def test_greater_with_boundary_values():
+    """
+    Test that the 'greater' method accurately identifies numbers greater than a given number,
+    specifically testing with boundary values in the dataset.
+    """
     capture = DataCapture()
     capture.add(1)
     capture.add(2)
@@ -30,6 +40,10 @@ def test_greater_with_boundary_values():
     assert stats.greater(3) == 0
 
 def test_greater_with_non_existent_values():
+    """
+    Test the 'greater' method with values that do not exist in the dataset,
+    ensuring it correctly returns zero when appropriate.
+    """
     capture = DataCapture()
     capture.add(3)
     capture.add(6)
@@ -38,6 +52,10 @@ def test_greater_with_non_existent_values():
     assert stats.greater(10) == 0
 
 def test_greater_with_invalid_input():
+    """
+    Test the 'greater' method with invalid input types,
+    ensuring it raises a TypeError when non-integer inputs are used.
+    """
     capture = DataCapture()
     capture.add(2)
     capture.add(5)
@@ -45,14 +63,21 @@ def test_greater_with_invalid_input():
     with pytest.raises(TypeError):
         stats.greater("b")
 
-# Tests for between
 def test_between_with_empty_list():
+    """
+    Test the 'between' method with an empty dataset,
+    ensuring it raises a ValueError when the dataset is empty.
+    """
     capture = DataCapture()
     with pytest.raises(ValueError) as excinfo:
         stats = capture.build_stats()
     assert "List cannot be empty" in str(excinfo.value)
 
 def test_between_with_non_existent_range():
+    """
+    Test the 'between' method for a range of values that do not exist in the dataset,
+    ensuring it returns zero when there are no numbers in the specified range.
+    """
     capture = DataCapture()
     capture.add(2)
     capture.add(5)
@@ -60,6 +85,10 @@ def test_between_with_non_existent_range():
     assert stats.between(10, 15) == 0
 
 def test_between_with_repeated_numbers():
+    """
+    Test the 'between' method with repeated numbers in the dataset,
+    ensuring it correctly counts the numbers within a specified range including duplicates.
+    """
     capture = DataCapture()
     capture.add(3)
     capture.add(3)
@@ -69,6 +98,10 @@ def test_between_with_repeated_numbers():
     assert stats.between(3, 4) == 3
 
 def test_between_with_invalid_input():
+    """
+    Test the 'between' method with invalid input types,
+    ensuring it raises a TypeError for non-integer range limits.
+    """
     capture = DataCapture()
     capture.add(1)
     capture.add(4)
