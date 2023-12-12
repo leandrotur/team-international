@@ -1,5 +1,5 @@
-
 from typing import List
+from bisect import bisect_left, bisect_right
 
 
 class Singleton(type):
@@ -8,26 +8,64 @@ class Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(
-                *args,
-                **kwargs
-            )
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
-
-
+    
+    
 class StatsGenerator(metaclass=Singleton):
-    """Main function is to generate stats"""
+    """
+    A class to generate statistics based on a sorted list of integers.
+
+    Attributes:
+        lst (List[int]): A sorted list of integers.
+    """
+
     def __init__(self, lst: List[int]) -> None:
-        self.lst = lst
+        """
+        Initialize the StatsGenerator with a list of integers and sort the list.
 
-    def less(self, number: int):
-        count = len([i for i in self.lst if i > number])
-        return count
+        Args:
+            lst (List[int]): A list of integers.
+        """
+        self.lst = sorted(lst)
 
-    def greater(self, number: int):
-        count = len([i for i in self.lst if i < number])
-        return count
+    def less(self, number: int) -> int:
+        """
+        Find the count of elements in the list that are less than the given number.
 
-    def between(self, min: int, max: int):
-        count = len([i for i in self.lst if i >= min and i <= max])
-        return count
+        Args:
+            number (int): The number to compare against.
+
+        Returns:
+            int: The count of elements less than the given number.
+        """
+        index = bisect_left(self.lst, number)
+        return index
+
+    def greater(self, number: int) -> int:
+        """
+        Find the count of elements in the list that are greater than the given number.
+
+        Args:
+            number (int): The number to compare against.
+
+        Returns:
+            int: The count of elements greater than the given number.
+        """
+        index = bisect_right(self.lst, number)
+        return len(self.lst) - index
+
+    def between(self, min: int, max: int) -> int:
+        """
+        Find the count of elements in the list that are between two given numbers (inclusive).
+
+        Args:
+            min (int): The minimum number in the range.
+            max (int): The maximum number in the range.
+
+        Returns:
+            int: The count of elements within the given range.
+        """
+        min_index = bisect_left(self.lst, min)
+        max_index = bisect_right(self.lst, max)
+        return max_index - min_index
