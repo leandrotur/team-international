@@ -10,8 +10,7 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
-    
-    
+
 class StatsGenerator(metaclass=Singleton):
     """
     A class to generate statistics based on a sorted list of integers.
@@ -26,7 +25,14 @@ class StatsGenerator(metaclass=Singleton):
 
         Args:
             lst (List[int]): A list of integers.
+
+        Raises:
+            ValueError: If the list is empty or contains non-integer elements.
         """
+        if not all(isinstance(x, int) for x in lst):
+            raise ValueError("List must contain only integers.")
+        if not lst:
+            raise ValueError("List cannot be empty.")
         self.lst = sorted(lst)
 
     def less(self, number: int) -> int:
@@ -38,7 +44,12 @@ class StatsGenerator(metaclass=Singleton):
 
         Returns:
             int: The count of elements less than the given number.
+
+        Raises:
+            TypeError: If the number is not an integer.
         """
+        if not isinstance(number, int):
+            raise TypeError("The number must be an integer.")
         index = bisect_left(self.lst, number)
         return index
 
@@ -51,7 +62,12 @@ class StatsGenerator(metaclass=Singleton):
 
         Returns:
             int: The count of elements greater than the given number.
+
+        Raises:
+            TypeError: If the number is not an integer.
         """
+        if not isinstance(number, int):
+            raise TypeError("The number must be an integer.")
         index = bisect_right(self.lst, number)
         return len(self.lst) - index
 
@@ -65,7 +81,15 @@ class StatsGenerator(metaclass=Singleton):
 
         Returns:
             int: The count of elements within the given range.
+
+        Raises:
+            TypeError: If min or max is not an integer.
+            ValueError: If min is greater than max.
         """
+        if not isinstance(min, int) or not isinstance(max, int):
+            raise TypeError("Both min and max must be integers.")
+        if min > max:
+            raise ValueError("Minimum value cannot be greater than maximum value.")
         min_index = bisect_left(self.lst, min)
         max_index = bisect_right(self.lst, max)
         return max_index - min_index
