@@ -2,16 +2,7 @@ from typing import List
 from bisect import bisect_left, bisect_right
 
 
-class Singleton(type):
-    """A metaclass for singleton purpose."""
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-class StatsGenerator(metaclass=Singleton):
+class StatsGenerator():
     """
     A class to generate statistics based on a sorted list of integers.
 
@@ -69,6 +60,8 @@ class StatsGenerator(metaclass=Singleton):
         if not isinstance(number, int):
             raise TypeError("The number must be an integer.")
         index = bisect_right(self.lst, number)
+        print(index)
+        print(len(self.lst))
         return len(self.lst) - index
 
     def between(self, min: int, max: int) -> int:
