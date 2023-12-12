@@ -60,8 +60,6 @@ class StatsGenerator():
         if not isinstance(number, int):
             raise TypeError("The number must be an integer.")
         index = bisect_right(self.lst, number)
-        print(index)
-        print(len(self.lst))
         return len(self.lst) - index
 
     def between(self, min: int, max: int) -> int:
