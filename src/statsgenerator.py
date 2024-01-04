@@ -1,6 +1,4 @@
 from typing import List
-from bisect import bisect_left, bisect_right
-
 
 class StatsGenerator():
     """
@@ -8,6 +6,8 @@ class StatsGenerator():
 
     Attributes:
         lst (List[int]): A sorted list of integers.
+        less_counts (List[int]): Precomputed counts of elements less than or equal to each index.
+        greater_counts (List[int]): Precomputed counts of elements greater than or equal to each index.
     """
 
     def __init__(self, lst: List[int]) -> None:
@@ -18,13 +18,44 @@ class StatsGenerator():
             lst (List[int]): A list of integers.
 
         Raises:
-            ValueError: If the list is empty or contains non-integer elements.
+            ValueError: If the list contains non-integer elements.
         """
-        if not all(isinstance(x, int) for x in lst):
+        if any(not isinstance(x, int) for x in lst):
             raise ValueError("List must contain only integers.")
         if not lst:
             raise ValueError("List cannot be empty.")
+        
         self.lst = sorted(lst)
+        self.less_counts = self._compute_less_counts()
+        self.greater_counts = self._compute_greater_counts()
+
+    def _compute_less_counts(self) -> List[int]:
+        """
+        Compute the counts of elements less than or equal to each index.
+
+        Returns:
+            List[int]: List of counts.
+        """
+        count = 0
+        less_counts = []
+        for num in self.lst:
+            count += 1
+            less_counts.append(count)
+        return less_counts
+
+    def _compute_greater_counts(self) -> List[int]:
+        """
+        Compute the counts of elements greater than or equal to each index.
+
+        Returns:
+            List[int]: List of counts.
+        """
+        count = 0
+        greater_counts = []
+        for num in reversed(self.lst):
+            count += 1
+            greater_counts.insert(0, count)
+        return greater_counts
 
     def less(self, number: int) -> int:
         """
@@ -41,8 +72,8 @@ class StatsGenerator():
         """
         if not isinstance(number, int):
             raise TypeError("The number must be an integer.")
-        index = bisect_left(self.lst, number)
-        return index
+        index = self._find_index(number)
+        return self.less_counts[index] if index >= 0 else 0
 
     def greater(self, number: int) -> int:
         """
@@ -59,8 +90,8 @@ class StatsGenerator():
         """
         if not isinstance(number, int):
             raise TypeError("The number must be an integer.")
-        index = bisect_right(self.lst, number)
-        return len(self.lst) - index
+        index = self._find_index(number)
+        return len(self.lst) - self.less_counts[index] if index >= 0 else 0
 
     def between(self, min: int, max: int) -> int:
         """
@@ -81,6 +112,31 @@ class StatsGenerator():
             raise TypeError("Both min and max must be integers.")
         if min > max:
             raise ValueError("Minimum value cannot be greater than maximum value.")
-        min_index = bisect_left(self.lst, min)
-        max_index = bisect_right(self.lst, max)
+
+        min_index = self._find_index(min - 1)
+        max_index = self._find_index(max)
         return max_index - min_index
+
+    def _find_index(self, number: int) -> int:
+        """
+        Find the index of the largest element less than or equal to the given number.
+
+        Args:
+            number (int): The number to compare against.
+
+        Returns:
+            int: The index of the largest element less than or equal to the given number.
+        """
+        left, right = 0, len(self.lst) - 1
+        index = -1
+
+        while left <= right:
+            mid = (left + right) // 2
+            if self.lst[mid] <= number:
+                index = mid
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return index
+
